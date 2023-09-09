@@ -5,12 +5,14 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import LoginScreen from './screens/LoginScreen'
 import RegisterScreen from './screens/RegisterScreen'
 import MainScreen from './screens/MainScreen'
+import { useState } from 'react'
 
 const Stack = createNativeStackNavigator();
 
+
 function MyStack() {
   return (
-    <Stack.Navigator initialRouteName='Main'>
+    <Stack.Navigator initialRouteName='Login'>
       <Stack.Screen name="Main" component={MainScreen} />
       <Stack.Screen name="Register" component={RegisterScreen} />
       <Stack.Screen name="Login" component={LoginScreen} />
@@ -19,6 +21,7 @@ function MyStack() {
 }
 
 export default function App() {
+
   return (
     <NavigationContainer>
       <MyStack />

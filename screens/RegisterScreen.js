@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
-import { View, Button, TextInput, ScrollView, StyleSheet } from 'react-native'
-import firebase from '../database/config'
+import { View, Text, TouchableOpacity, TextInput, ScrollView, StyleSheet } from 'react-native'
+import firebase, { app } from '../database/config'
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth'
+import { initializeApp } from 'firebase/app'
+
 
 const RegisterScreen = (props) => {
 
@@ -12,11 +15,13 @@ const RegisterScreen = (props) => {
         house: ""
     })
 
+    const auth = getAuth(app)
+
     const handleTextChange = (name, value) => {
         setState({ ...state, [name]: value })
     }
 
-    const addNewUser = async () => {
+    const handleCreateUser = async () => {
         console.log(state)
         if (state.name === "") {
             alert("Es necesario un nombre")
@@ -32,12 +37,12 @@ const RegisterScreen = (props) => {
                 await firebase.db.collection('users').add({
                     name: state.name,
                     email: state.email,
-                    password: state.password,
                     houseId: newHouse.id
                 })
-                props.navigation.navigate('Main');
+                await createUserWithEmailAndPassword(auth, state.email, state.password)
+                props.navigation.navigate('Login');
             } catch (error) {
-                console.log(error)
+                alert(error)
             }
 
         }
@@ -60,12 +65,14 @@ const RegisterScreen = (props) => {
             <View style={styles.inputGroup}>
                 <TextInput
                     placeholder="Password"
+                    secureTextEntry={true}
                     onChangeText={(value) => handleTextChange('password', value)}
                 />
             </View>
             <View style={styles.inputGroup}>
                 <TextInput
                     placeholder="Repeat password"
+                    secureTextEntry={true}
                     onChangeText={(value) => handleTextChange('password2', value)}
                 />
             </View>
@@ -75,9 +82,11 @@ const RegisterScreen = (props) => {
                     onChangeText={(value) => handleTextChange('house', value)}
                 />
             </View>
-            <View>
-                <Button title="Register" onPress={addNewUser} />
-            </View>
+
+            <TouchableOpacity onPress={handleCreateUser} style={styles.appButtonContainer}>
+                <Text style={styles.appButtonText}>Register</Text>
+            </TouchableOpacity>
+
         </ScrollView>
     )
 }
@@ -85,7 +94,7 @@ const RegisterScreen = (props) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 35
+        padding: 35,
     },
     inputGroup: {
         padding: 0,
@@ -93,6 +102,21 @@ const styles = StyleSheet.create({
         flex: 1,
         borderBottomWidth: 2,
         borderBottomColor: '#a3a3a3',
+    },
+    appButtonContainer: {
+        elevation: 8,
+        backgroundColor: "#009688",
+        borderRadius: 10,
+        paddingVertical: 10,
+        paddingHorizontal: 12,
+        marginBottom: 15
+    },
+    appButtonText: {
+        fontSize: 15,
+        color: "#fff",
+        fontWeight: "bold",
+        alignSelf: "center",
+        textTransform: "uppercase"
     }
 })
 
