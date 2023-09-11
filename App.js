@@ -5,7 +5,10 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import LoginScreen from './screens/LoginScreen'
 import RegisterScreen from './screens/RegisterScreen'
 import MainScreen from './screens/MainScreen'
+import ScanQrScreen from './screens/ScanQrScreen'
 import { useState } from 'react'
+import { Provider } from "react-redux";
+import { store } from "./store/store";
 
 const Stack = createNativeStackNavigator();
 
@@ -21,6 +24,7 @@ function MyStack() {
       <Stack.Screen name="Main" component={MainScreen} />
       <Stack.Screen name="Register" component={RegisterScreen} />
       <Stack.Screen name="Login" component={LoginScreen} />
+      <Stack.Screen name="ScanQR" component={ScanQrScreen} />
     </Stack.Navigator>
   )
 }
@@ -28,10 +32,11 @@ function MyStack() {
 export default function App() {
 
   return (
-    <NavigationContainer>
-      <MyStack />
-    </NavigationContainer>
-
+    <Provider store={store}>
+      <NavigationContainer>
+        <MyStack />
+      </NavigationContainer>
+    </Provider>
   );
 }
 

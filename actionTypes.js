@@ -1,1 +1,5 @@
 export const LOG_IN_OK = 'LOG_IN_OK'
+
+export const SHOW_HOUSE_FIELD = 'SHOW_HOUSE_FIELD'
+
+export const CLOSE_HOUSE_FIELD = 'CLOSE_HOUSE_FIELD'

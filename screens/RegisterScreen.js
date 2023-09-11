@@ -1,15 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, TextInput, ScrollView, StyleSheet } from 'react-native'
 import firebase from '../database/config'
 import FloatingLabelInput from '../components/FloatingLabelInput';
-
+import { useDispatch, useSelector } from "react-redux";
+import { showHouseNameField, closeHouseNameField } from "../actions/register/register";
 import RadioButton from '../components/RadioButton'
-
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth'
+import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth'
 import { initializeApp } from 'firebase/app'
 
 
 const RegisterScreen = (props) => {
+
+    const displayField = useSelector(state => state.register.displayField);
+
+    const dispatch = useDispatch();
 
     const [state, setState] = useState({
         name: "",
@@ -19,13 +23,26 @@ const RegisterScreen = (props) => {
         house: ""
     })
 
+    useEffect(() => {
+        displayField ? console.log('Mostrar') : console.log('No mostrar')
+    }, [displayField]);
+
+    const options = ["Create a Home", "Join a Home"]
     const [selectedOption, setSelectedOption] = useState(null);
 
     const handleSelect = (option) => {
         setSelectedOption(option);
+        console.log("Opción elegida: " + option)
+        console.log("Opción en selectedOption: " + selectedOption)
+        if (option == options[0]) {
+            dispatch(showHouseNameField())
+            console.log("display tras dispatch del show es " + displayField)
+        } else {
+            dispatch(closeHouseNameField())
+            console.log("display tras dispatch del close es " + displayField)
+        }
     };
 
-    const options = ["Create a Home", "Join a Home"]
 
     const auth = getAuth(firebase.app)
 
@@ -42,8 +59,14 @@ const RegisterScreen = (props) => {
             alert("An email is mandatory to join us")
         } else if (state.password !== state.password2) {
             alert("Passwords are not equal")
+        } else if (displayField && state.house === "") {
+            alert("You must enter a house name")
         } else {
             try {
+                if (selectedOption === options[1]) {
+                    props.navigation.navigate('ScanQR')
+                    return;
+                }
                 let newHouse = await firebase.db.collection('houses').add({
                     houseName: state.house
                 })
@@ -70,7 +93,7 @@ const RegisterScreen = (props) => {
                         style={styles.textInput}
                         label="User name"
                         value={state.name}
-                        onChangeText={(value) => handleTextChange('password', value)}
+                        onChangeText={(value) => handleTextChange('name', value)}
                     />
                 </View>
                 <View>
@@ -78,7 +101,7 @@ const RegisterScreen = (props) => {
                         style={styles.textInput}
                         label="Email"
                         value={state.email}
-                        onChangeText={(value) => handleTextChange('password', value)}
+                        onChangeText={(value) => handleTextChange('email', value)}
                     />
                 </View>
                 <View>
@@ -96,26 +119,28 @@ const RegisterScreen = (props) => {
                         label="Repeat password"
                         secureTextEntry={true}
                         value={state.password2}
-                        onChangeText={(value) => handleTextChange('password', value)}
+                        onChangeText={(value) => handleTextChange('password2', value)}
                     />
                 </View>
             </View>
 
             <View>
-                <Text style={styles.groupName}>House</Text>
+                <Text style={styles.groupName}>Home</Text>
                 <View>
                     <RadioButton
                         options={options}
                         selectedOption={selectedOption}
                         onSelect={handleSelect}
                     />
-                    <View style={styles.inputGroup}>
-                        <TextInput
+                    {displayField ? <View >
+                        <FloatingLabelInput
                             style={styles.textInput}
-                            placeholder="House name"
+                            label="House name"
+                            value={state.house}
                             onChangeText={(value) => handleTextChange('house', value)}
                         />
-                    </View>
+                    </View> : null}
+
                 </View>
             </View>
             <TouchableOpacity onPress={handleCreateUser} style={styles.appButtonContainer}>

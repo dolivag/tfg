@@ -8,8 +8,9 @@ const FloatingTextInput = ({
     titleInActiveSize = 14,
     titleActiveColor = '#009688',
     titleInactiveColor = '#c2c2c2',
+    onChangeText
 }) => {
-    const [text, onChangeText] = React.useState('');
+    const [text, setText] = useState('');
     const animatedValue = useRef(new Animated.Value(0));
     const [isFocused, setIsFocused] = useState(false);
 
@@ -74,12 +75,18 @@ const FloatingTextInput = ({
         }
     };
 
+    const handleTextChange = (text) => {
+        setText(text)
+        // Llama a la función onChangeText pasada como prop para propagar los cambios al padre
+        onChangeText(text);
+    };
+
     return (
         <Animated.View style={styles.subContainer}>
             <Animated.Text style={[returnAnimatedTitleStyles]} >{label}</Animated.Text>
             <TextInput
-                onChangeText={onChangeText}
-                value={text}
+                onChangeText={handleTextChange}
+
                 style={[styles.textStyle, isFocused ? styles.inputFocus : styles.textStyle]}
                 onBlur={onBlur}
                 onFocus={onFocus}
