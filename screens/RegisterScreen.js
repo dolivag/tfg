@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, TextInput, ScrollView, StyleSheet } from 'react-native'
-import firebase, { app } from '../database/config'
+import firebase from '../database/config'
+import FloatingLabelInput from '../components/FloatingLabelInput';
+
+import RadioButton from '../components/RadioButton'
+
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth'
 import { initializeApp } from 'firebase/app'
 
@@ -15,20 +19,29 @@ const RegisterScreen = (props) => {
         house: ""
     })
 
-    const auth = getAuth(app)
+    const [selectedOption, setSelectedOption] = useState(null);
+
+    const handleSelect = (option) => {
+        setSelectedOption(option);
+    };
+
+    const options = ["Create a Home", "Join a Home"]
+
+    const auth = getAuth(firebase.app)
 
     const handleTextChange = (name, value) => {
         setState({ ...state, [name]: value })
+        console.log('cambios');
     }
 
     const handleCreateUser = async () => {
         console.log(state)
         if (state.name === "") {
-            alert("Es necesario un nombre")
+            alert("A name is mandatory to join us")
         } else if (state.email === "") {
-            alert("Es necesario un email")
+            alert("An email is mandatory to join us")
         } else if (state.password !== state.password2) {
-            alert("Las contraseñas no coinciden")
+            alert("Passwords are not equal")
         } else {
             try {
                 let newHouse = await firebase.db.collection('houses').add({
@@ -50,43 +63,64 @@ const RegisterScreen = (props) => {
 
     return (
         <ScrollView style={styles.container}>
-            <View style={styles.inputGroup}>
-                <TextInput
-                    placeholder="User name"
-                    onChangeText={(value) => handleTextChange('name', value)}
-                />
-            </View>
-            <View style={styles.inputGroup}>
-                <TextInput
-                    placeholder="Email"
-                    onChangeText={(value) => handleTextChange('email', value)}
-                />
-            </View>
-            <View style={styles.inputGroup}>
-                <TextInput
-                    placeholder="Password"
-                    secureTextEntry={true}
-                    onChangeText={(value) => handleTextChange('password', value)}
-                />
-            </View>
-            <View style={styles.inputGroup}>
-                <TextInput
-                    placeholder="Repeat password"
-                    secureTextEntry={true}
-                    onChangeText={(value) => handleTextChange('password2', value)}
-                />
-            </View>
-            <View style={styles.inputGroup}>
-                <TextInput
-                    placeholder="Nombre de la casa"
-                    onChangeText={(value) => handleTextChange('house', value)}
-                />
+            <View>
+                <Text style={styles.groupName}>Personal data</Text>
+                <View>
+                    <FloatingLabelInput
+                        style={styles.textInput}
+                        label="User name"
+                        value={state.name}
+                        onChangeText={(value) => handleTextChange('password', value)}
+                    />
+                </View>
+                <View>
+                    <FloatingLabelInput
+                        style={styles.textInput}
+                        label="Email"
+                        value={state.email}
+                        onChangeText={(value) => handleTextChange('password', value)}
+                    />
+                </View>
+                <View>
+                    <FloatingLabelInput
+                        style={styles.textInput}
+                        label="Password"
+                        secureTextEntry={true}
+                        value={state.password}
+                        onChangeText={(value) => handleTextChange('password', value)}
+                    />
+                </View>
+                <View>
+                    <FloatingLabelInput
+                        style={styles.textInput}
+                        label="Repeat password"
+                        secureTextEntry={true}
+                        value={state.password2}
+                        onChangeText={(value) => handleTextChange('password', value)}
+                    />
+                </View>
             </View>
 
+            <View>
+                <Text style={styles.groupName}>House</Text>
+                <View>
+                    <RadioButton
+                        options={options}
+                        selectedOption={selectedOption}
+                        onSelect={handleSelect}
+                    />
+                    <View style={styles.inputGroup}>
+                        <TextInput
+                            style={styles.textInput}
+                            placeholder="House name"
+                            onChangeText={(value) => handleTextChange('house', value)}
+                        />
+                    </View>
+                </View>
+            </View>
             <TouchableOpacity onPress={handleCreateUser} style={styles.appButtonContainer}>
                 <Text style={styles.appButtonText}>Register</Text>
             </TouchableOpacity>
-
         </ScrollView>
     )
 }
@@ -94,7 +128,8 @@ const RegisterScreen = (props) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 35,
+        paddingHorizontal: 35,
+        paddingVertical: 15
     },
     inputGroup: {
         padding: 0,
@@ -103,13 +138,17 @@ const styles = StyleSheet.create({
         borderBottomWidth: 2,
         borderBottomColor: '#a3a3a3',
     },
+    textInput: {
+        fontSize: 16,
+        color: 'black',
+    },
     appButtonContainer: {
         elevation: 8,
         backgroundColor: "#009688",
         borderRadius: 10,
         paddingVertical: 10,
         paddingHorizontal: 12,
-        marginBottom: 15
+        marginTop: 15
     },
     appButtonText: {
         fontSize: 15,
@@ -117,6 +156,14 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         alignSelf: "center",
         textTransform: "uppercase"
+    },
+    groupName: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        textTransform: 'uppercase',
+        color: '#009688',
+        marginTop: 15,
+        marginBottom: 5
     }
 })
 

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, ScrollView, Button, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native'
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth'
-import { app } from '../database/config'
+import firebase from '../database/config'
 
 function LoginScreen({ navigation }) {
 
@@ -14,7 +14,7 @@ function LoginScreen({ navigation }) {
         setState({ ...state, [name]: value })
     }
 
-    const auth = getAuth(app)
+    const auth = getAuth(firebase.app)
 
     const handleSignIn = async (userCredential) => {
         try {
