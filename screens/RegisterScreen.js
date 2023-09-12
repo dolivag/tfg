@@ -7,6 +7,7 @@ import { showHouseNameField, closeHouseNameField } from "../actions/register/reg
 import RadioButton from '../components/RadioButton'
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth'
 import { initializeApp } from 'firebase/app'
+import { updateHouseId } from '../actions/user/userInfo';
 
 
 const RegisterScreen = (props) => {
@@ -48,7 +49,6 @@ const RegisterScreen = (props) => {
 
     const handleTextChange = (name, value) => {
         setState({ ...state, [name]: value })
-        console.log('cambios');
     }
 
     const handleCreateUser = async () => {
@@ -76,6 +76,7 @@ const RegisterScreen = (props) => {
                     houseId: newHouse.id
                 })
                 await createUserWithEmailAndPassword(auth, state.email, state.password)
+
                 props.navigation.navigate('Login');
             } catch (error) {
                 alert(error)

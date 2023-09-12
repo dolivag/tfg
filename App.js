@@ -6,6 +6,7 @@ import LoginScreen from './screens/LoginScreen'
 import RegisterScreen from './screens/RegisterScreen'
 import MainScreen from './screens/MainScreen'
 import ScanQrScreen from './screens/ScanQrScreen'
+import QRScreen from './screens/QRScreen'
 import { useState } from 'react'
 import { Provider } from "react-redux";
 import { store } from "./store/store";
@@ -24,6 +25,7 @@ function MyStack() {
       <Stack.Screen name="Main" component={MainScreen} />
       <Stack.Screen name="Register" component={RegisterScreen} />
       <Stack.Screen name="Login" component={LoginScreen} />
+      <Stack.Screen name="QRScreen" component={QRScreen} />
       <Stack.Screen name="ScanQR" component={ScanQrScreen} />
     </Stack.Navigator>
   )

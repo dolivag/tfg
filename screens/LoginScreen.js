@@ -1,9 +1,36 @@
 import React, { useState } from 'react';
-import { View, ScrollView, Button, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native'
+import { useDispatch } from "react-redux";
+import { Alert, View, ScrollView, Button, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native'
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth'
 import firebase from '../database/config'
+import { updateHouseId } from '../actions/user/userInfo';
+
 
 function LoginScreen({ navigation }) {
+
+    const dispatch = useDispatch();
+
+    const getUser = async (email) => {
+        firebase.db.collection('users')
+            .where('email', '==', email) // La condición para buscar por email (aunque es único)
+            .get()
+            .then((querySnapshot) => {
+                if (!querySnapshot.empty) {
+                    // Solo debe haber un resultado, accede al primer documento
+                    const doc = querySnapshot.docs[0];
+                    const userData = doc.data();
+                    const houseId = userData.houseId; // Obtener el atributo houseId del documento
+                    console.log('El id de la casa es: ' + houseId);
+                    dispatch(updateHouseId(houseId))
+                } else {
+                    // No se encontró ningún usuario con ese email
+                    console.log('No se encontró ningún usuario con ese email.');
+                }
+            })
+            .catch((error) => {
+                console.error('Error al buscar el usuario:', error);
+            });
+    }
 
     const [state, setState] = useState({
         email: "",
@@ -20,7 +47,7 @@ function LoginScreen({ navigation }) {
         try {
 
             signInWithEmailAndPassword(auth, state.email, state.password)
-            console.log(userCredential.user)
+            getUser(state.email)
             navigation.navigate('Main')
         } catch (error) {
             Alert.alert(error)
