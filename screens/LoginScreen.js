@@ -4,9 +4,15 @@ import { Alert, View, ScrollView, Button, Text, TextInput, StyleSheet, Touchable
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth'
 import firebase from '../database/config'
 import { updateHouseId } from '../actions/user/userInfo';
+import FloatingLabelInput from '../components/FloatingLabelInput';
+import GoogleLoginButton from '../components/GoogleLoginButton';
+import { GoogleSignin, statusCodes } from 'react-native-google-signin';
+
 
 
 function LoginScreen({ navigation }) {
+
+
 
     const dispatch = useDispatch();
 
@@ -46,28 +52,34 @@ function LoginScreen({ navigation }) {
     const handleSignIn = async (userCredential) => {
         try {
 
-            signInWithEmailAndPassword(auth, state.email, state.password)
+            await signInWithEmailAndPassword(auth, state.email, state.password)
             getUser(state.email)
             navigation.navigate('Main')
         } catch (error) {
             Alert.alert(error)
         }
+    }
 
+    const googleLogin = async () => {
+        signInWithGoogle()
     }
 
     return (
         <ScrollView style={styles.container}>
             <View >
-                <TextInput
+                <FloatingLabelInput
                     style={styles.inputGroup}
-                    placeholder="Email"
+                    label="Email"
+                    value={state.email}
                     onChangeText={(value) => handleTextChange('email', value)}
                 />
             </View>
             <View>
-                <TextInput
+                <FloatingLabelInput
                     style={styles.inputGroup}
-                    placeholder="Password"
+                    label="Password"
+                    value={state.password}
+                    secureTextEntry={true}
                     onChangeText={(value) => handleTextChange('password', value)}
                 />
             </View>
@@ -84,6 +96,7 @@ function LoginScreen({ navigation }) {
             >
                 <Text style={styles.appButtonText}>Register</Text>
             </TouchableOpacity>
+            <GoogleLoginButton onPress={googleLogin} />
         </ScrollView>
     )
 }
@@ -105,7 +118,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         paddingVertical: 10,
         paddingHorizontal: 12,
-        marginBottom: 15
+        marginTop: 15
     },
     appButtonText: {
         fontSize: 15,
